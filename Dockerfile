@@ -1,7 +1,7 @@
 FROM php:apache
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
-RUN apt-get update -y && apt-get install -y sudo openssl zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev curl libpng-dev nano git openssh-server && docker-php-ext-install pdo pdo_pgsql zip gd exif
+RUN apt-get update -y && apt-get install -y sudo openssl zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev curl libpng-dev nano git openssh-server && docker-php-ext-install pdo pdo_pgsql pdo_mysql zip gd exif
 RUN a2enmod rewrite
 RUN echo "IncludeOptional /var/www/vhost.conf" >> /etc/apache2/apache2.conf
 RUN rm /etc/apache2/sites-enabled/*.conf
