@@ -1,6 +1,6 @@
-FROM php:apache
+FROM php:8.0-apache
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=1.10.1
 RUN apt-get update -y && apt-get install -y sudo openssl zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev curl libpng-dev nano git openssh-server && docker-php-ext-install pdo pdo_pgsql pdo_mysql mysqli zip gd exif
 RUN a2enmod rewrite
 RUN echo "IncludeOptional /var/www/vhost.conf" >> /etc/apache2/apache2.conf
@@ -28,15 +28,16 @@ RUN apt-get install -y nodejs
 
 
 ####### INSTALL LARAVEL #######
-RUN su - competitor -c "composer global require laravel/installer"
+RUN su - competitor -c "composer global require laravel/installer:8.6.3"
 RUN ln -s /var/www/.config/composer/vendor/bin/laravel /usr/local/bin/laravel
 #RUN laravel new demo
 
 ####### INSTALL ANGULAR CLI #######
-RUN npm install -g @angular/cli
+RUN npm install -g @angular/cli@12.2.9
 
 ####### INSTALL VUE CLI #######
-RUN npm install -g @vue/cli
+RUN npm install -g @vue/cli@2.6.14
+
 
 ####### BEGIN STARTUP #######
 WORKDIR /var/www/
@@ -44,3 +45,6 @@ WORKDIR /var/www/
 ADD ./entrypoint.sh /root/entrypoint.sh
 RUN chown root.root /root/entrypoint.sh
 ENTRYPOINT ["/root/entrypoint.sh"]
+
+## TODO: phpMyAdmin? PHPunit 9 / Cypress 9.5 / TestCafe 1.18?
+## TODO: let competitor/root create databases via 127.0.0.1 (ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password)
