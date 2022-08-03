@@ -1,7 +1,9 @@
 FROM php:8.0-apache
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=1.10.1
-RUN apt-get update -y && apt-get install -y sudo openssl zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev curl libpng-dev nano git openssh-server && docker-php-ext-install pdo pdo_pgsql pdo_mysql mysqli zip gd exif
+#RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=1.10.23
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=2.1.9
+RUN apt-get update -y && apt-get install -y sudo openssl zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev libpng-dev curl nano git openssh-server
+RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mysqli zip gd exif
 RUN a2enmod rewrite
 RUN echo "IncludeOptional /var/www/vhost.conf" >> /etc/apache2/apache2.conf
 RUN rm /etc/apache2/sites-enabled/*.conf
@@ -28,15 +30,23 @@ RUN apt-get install -y nodejs
 
 
 ####### INSTALL LARAVEL #######
-RUN su - competitor -c "composer global require laravel/installer:8.6.3"
-RUN ln -s /var/www/.config/composer/vendor/bin/laravel /usr/local/bin/laravel
+RUN su - competitor -c "composer global require -W laravel/framework:8.63.0" && \
+su - competitor -c "composer global require laravel/laravel:8.6.3" && \
+su - competitor -c "composer global require laravel/installer:4.2.8" && \
+ln -s /var/www/.config/composer/vendor/bin/laravel /usr/local/bin/laravel
 #RUN laravel new demo
 
 ####### INSTALL ANGULAR CLI #######
 RUN npm install -g @angular/cli@12.2.9
 
 ####### INSTALL VUE CLI #######
-RUN npm install -g @vue/cli@2.6.14
+RUN npm install -g vue@3.2.20 && \
+npm install -g @vue/cli@4.5.14
+
+####### INSTALL UNITTESTING #######
+RUN su - competitor -c "composer global require -W phpunit/phpunit:9.5.10"
+RUN npm install -g testcafe@1.18.0 && \
+npm install --save-dev cypress@9.5.0
 
 
 ####### BEGIN STARTUP #######
@@ -46,5 +56,5 @@ ADD ./entrypoint.sh /root/entrypoint.sh
 RUN chown root.root /root/entrypoint.sh
 ENTRYPOINT ["/root/entrypoint.sh"]
 
-## TODO: phpMyAdmin? PHPunit 9 / Cypress 9.5 / TestCafe 1.18?
+## TODO: phpMyAdmin?
 ## TODO: let competitor/root create databases via 127.0.0.1 (ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password)
