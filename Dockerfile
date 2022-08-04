@@ -1,9 +1,8 @@
 FROM php:8.0-apache
 
-#RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=1.10.23
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=2.1.9
-RUN apt-get update -y && apt-get install -y sudo openssl zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev libpng-dev curl nano git openssh-server
-RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mysqli zip gd exif
+RUN apt-get update -y && apt-get install -y sudo build-essential openssl openssh-server zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev libpng-dev libjpeg-dev libfreetype6-dev curl nano git
+RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mysqli zip gd exif && \
+docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN a2enmod rewrite
 RUN echo "IncludeOptional /var/www/vhost.conf" >> /etc/apache2/apache2.conf
 RUN rm /etc/apache2/sites-enabled/*.conf
@@ -23,6 +22,10 @@ RUN usermod -aG sudo competitor
 
 ####### BEGIN MARIADB #######
 RUN apt-get install -y mariadb-server
+
+####### INSTALL COMPOSER #######
+#RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=1.10.23
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=2.1.9
 
 ####### INSTALL NODE #######
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
@@ -48,6 +51,14 @@ RUN su - competitor -c "composer global require -W phpunit/phpunit:9.5.10"
 RUN npm install -g testcafe@1.18.0 && \
 npm install --save-dev cypress@9.5.0
 
+####### PROVIDE STATIC LIBRARIES/PACKAGES #######
+RUN mkdir /var/www/packages && \
+curl -o /var/www/packages/yii-basic-app-2.0.43.tgz https://github.com/yiisoft/yii2/releases/download/2.0.43/yii-basic-app-2.0.43.tgz && \
+curl -o /var/www/packages/codeigniter_4.1.4.zip https://api.github.com/repos/codeigniter4/CodeIgniter4/zipball/v4.1.4 && \
+curl -o /var/www/packages/wordpress_5.8.1.zip https://wordpress.org/wordpress-5.8.1.zip && \
+curl -o /var/www/packages/react_17.0.2.tgz https://registry.npmjs.org/react/-/react-17.0.2.tgz && \
+curl -o /var/www/packages/zurbfoundation_6.7.3.tgz https://registry.npmjs.org/foundation/-/foundation-6.7.3.tgz && \
+curl -o /var/www/packages/bootstrap_5.1.3.zip https://github.com/twbs/bootstrap/archive/v5.1.3.zip
 
 ####### BEGIN STARTUP #######
 WORKDIR /var/www/
@@ -56,5 +67,5 @@ ADD ./entrypoint.sh /root/entrypoint.sh
 RUN chown root.root /root/entrypoint.sh
 ENTRYPOINT ["/root/entrypoint.sh"]
 
-## TODO: phpMyAdmin?
+## TODO: phpMyAdmin/adminer?
 ## TODO: let competitor/root create databases via 127.0.0.1 (ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password)
