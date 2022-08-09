@@ -2,8 +2,8 @@
 FROM php:8.0-apache
 
 RUN apt-get update -y && apt-get install -y sudo build-essential openssl openssh-server zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev libpng-dev libjpeg-dev libfreetype6-dev curl nano git
-RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mysqli zip gd exif && \
-docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mysqli zip gd exif
 RUN a2enmod rewrite
 RUN echo "IncludeOptional /var/www/vhost.conf" >> /etc/apache2/apache2.conf
 RUN rm /etc/apache2/sites-enabled/*.conf
