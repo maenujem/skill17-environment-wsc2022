@@ -1,3 +1,4 @@
+#FROM php:7.4-apache
 FROM php:8.0-apache
 
 RUN apt-get update -y && apt-get install -y sudo build-essential openssl openssh-server zip unzip zlib1g-dev libpq-dev libicu-dev libzip-dev libpng-dev libjpeg-dev libfreetype6-dev curl nano git
