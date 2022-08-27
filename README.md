@@ -22,4 +22,10 @@ and to transfer files (if not in bind-mounted directory) either
 * if they are stored in the container `docker exec -it skill17container tar --exclude='./node_modules' -zcf /tmp/app.tar.gz /var/www/html/ && docker cp skill17container:/tmp/app.tar.gz ./app.tar.gz`
 
 
-TODO: port 4200, 8000 =?
+## Ports
+* 22: ssh/sftp
+* 80: http
+* 3306: mysqlDB
+* 4200: angular
+* 8000: ?
+
